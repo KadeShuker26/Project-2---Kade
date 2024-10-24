@@ -10,7 +10,7 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
   const [postcode, setPostcode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [customerTypeValue, setCustomerTypeValue] = useState('consumer'); // To manage internal state of customer type
+  const [customerTypeValue, setCustomerTypeValue] = useState('consumer');
 
   useEffect(() => {
     setCustomerDetails({
@@ -24,7 +24,7 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
       phoneNumber,
       email,
     });
-    setCustomerType(customerTypeValue); // Update parent component with the current customer type
+    setCustomerType(customerTypeValue);
   }, [customerTitle, firstName, lastName, street, suburb, city, postcode, phoneNumber, email, customerTypeValue, setCustomerDetails, setCustomerType]);
 
   useImperativeHandle(ref, () => ({
@@ -38,12 +38,36 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
       setPostcode('');
       setPhoneNumber('');
       setEmail('');
-      setCustomerTypeValue('consumer'); // Reset customer type to 'consumer'
+      setCustomerTypeValue('consumer');
     }
   }));
 
   const handleCustomerTypeChange = (e) => {
     setCustomerTypeValue(e.target.value);
+  };
+
+  const handleCustomValidity = (field, value) => {
+    switch (field) {
+      case 'firstName':
+      case 'lastName':
+        if (!/^[a-zA-Z\s\-]+$/.test(value)) {
+          return 'Only alphabetical characters, spaces, and the - symbol are allowed.';
+        }
+        break;
+      case 'postcode':
+        if (value && !/^\d{4}$/.test(value)) {
+          return 'Postcode must be exactly 4 digits.';
+        }
+        break;
+      case 'phoneNumber':
+        if (!/^[\d\s\-\+\(\)]+$/.test(value)) {
+          return 'Only numbers, spaces, and ( ), -, + symbols are allowed.';
+        }
+        break;
+      default:
+        return '';
+    }
+    return '';
   };
 
   return (
@@ -100,6 +124,9 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
           id="fname"
           required
           value={firstName}
+          pattern="^[a-zA-Z\s\-]+$"
+          onInvalid={(e) => e.target.setCustomValidity(handleCustomValidity('firstName', e.target.value))}
+          onInput={(e) => e.target.setCustomValidity('')}
           onChange={(e) => setFirstName(e.target.value)}
         />
       </div>
@@ -113,6 +140,9 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
           id="lname"
           required
           value={lastName}
+          pattern="^[a-zA-Z\s\-]+$"
+          onInvalid={(e) => e.target.setCustomValidity(handleCustomValidity('lastName', e.target.value))}
+          onInput={(e) => e.target.setCustomValidity('')}
           onChange={(e) => setLastName(e.target.value)}
         />
       </div>
@@ -155,7 +185,7 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
         />
       </div>
 
-      {/* Postcode */}
+      {/* Postcode (Optional) */}
       <div className="row mt-1">
         <label className="col-12 col-md-12 col-lg-4">Postcode</label>
         <input
@@ -163,6 +193,9 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
           type="text"
           id="postcode"
           value={postcode}
+          pattern="^\d{4}$"
+          onInvalid={(e) => e.target.setCustomValidity(handleCustomValidity('postcode', e.target.value))}
+          onInput={(e) => e.target.setCustomValidity('')}
           onChange={(e) => setPostcode(e.target.value)}
         />
       </div>
@@ -176,6 +209,9 @@ const FormCustomerDetail = forwardRef(({ setCustomerDetails, setCustomerType }, 
           id="phoneNumber"
           required
           value={phoneNumber}
+          pattern="^[\d\s\-\+\(\)]+$"
+          onInvalid={(e) => e.target.setCustomValidity(handleCustomValidity('phoneNumber', e.target.value))}
+          onInput={(e) => e.target.setCustomValidity('')}
           onChange={(e) => setPhoneNumber(e.target.value)}
         />
       </div>

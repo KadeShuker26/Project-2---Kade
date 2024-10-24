@@ -114,7 +114,7 @@ function Home() {
         // Collecting Courtesy Phone Items
         courtesyPhoneItems, // Courtesy Phone Items from state
         // Collecting Cost Data
-        serviceFee: bond + (warranty ? 0 : 85), // Calculating service fee here for simplicity
+        serviceFee: (warranty ? 0 : 85), // Calculating service fee here for simplicity
         total: bond + (warranty ? 0 : 85),
         gst: (bond + (warranty ? 0 : 85)) * 0.15,
         totalWithGst: (bond + (warranty ? 0 : 85)) * 1.15

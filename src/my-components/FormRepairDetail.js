@@ -39,32 +39,46 @@ const FormRepairDetail = forwardRef(({ setRepairDetails, setWarranty }, ref) => 
 
   const getToday = () => new Date().toISOString().split('T')[0];
 
-  const addOneDay = (date) => {
-    const nextDay = new Date(date);
-    nextDay.setDate(nextDay.getDate() + 1);
-    return nextDay.toISOString().split('T')[0];
-  };
-
   const handlePurchaseDateChange = (e) => {
     const value = e.target.value;
     setPurchaseDate(value);
 
-    // Calculate the warranty eligibility (within 24 months)
     const monthsDiff = (new Date() - new Date(value)) / (1000 * 60 * 60 * 24 * 30);
     setIsWarrantyEnabled(monthsDiff <= 24);
 
-    // Reset the repair date if it's before or the same as the purchase date
     if (new Date(repairDate) <= new Date(value)) {
       setRepairDate('');
+    }
+
+    if (monthsDiff > 24) {
+      setUnderWarranty(false);
     }
   };
 
   const handleRepairDateChange = (e) => {
-    setRepairDate(e.target.value);
+    const value = e.target.value;
+    setRepairDate(value);
+
+    if (purchaseDate) {
+      const monthsDiff = (new Date(value) - new Date(purchaseDate)) / (1000 * 60 * 60 * 24 * 30);
+      if (monthsDiff > 24) {
+        setUnderWarranty(false);
+        setIsWarrantyEnabled(false);
+      }
+    }
   };
 
   const handleWarrantyChange = (e) => {
     setUnderWarranty(e.target.checked);
+  };
+
+  const handleImeiChange = (e) => {
+    const value = e.target.value;
+    e.target.setCustomValidity(''); // Clear previous custom validity message
+    if (!/^\d{15}$/.test(value)) {
+      e.target.setCustomValidity('IMEI number must only be numbers with a length of 15.');
+    }
+    setImei(value);
   };
 
   return (
@@ -95,8 +109,8 @@ const FormRepairDetail = forwardRef(({ setRepairDetails, setWarranty }, ref) => 
           required
           value={repairDate}
           onChange={handleRepairDateChange}
-          min={purchaseDate ? addOneDay(purchaseDate) : ''}
-          disabled={!purchaseDate} // Disable until a purchase date is selected
+          min={getToday()}
+          disabled={!purchaseDate}
         />
       </div>
 
@@ -126,7 +140,7 @@ const FormRepairDetail = forwardRef(({ setRepairDetails, setWarranty }, ref) => 
           id="imei"
           required
           value={imei}
-          onChange={(e) => setImei(e.target.value)}
+          onChange={handleImeiChange}
           pattern="\d{15}"
           placeholder="Enter 15-digit IMEI number"
         />

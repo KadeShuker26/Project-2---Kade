@@ -3,17 +3,25 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 const FormCourtesyPhone = forwardRef(({ customerType, setBond, setCourtesyPhoneItems }, ref) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemType, setSelectedItemType] = useState('none');
+  const [selectedChargerType, setSelectedChargerType] = useState('none');
 
   const itemTypes = {
-    iphone: { name: 'iPhone', cost: 275 },
-    other: { name: 'Other Phone', cost: 100 },
-    charger: { name: 'Charger', cost: 30 },
+    iphone10: { name: 'iPhone 10', cost: 275 },
+    iphone14: { name: 'iPhone 14', cost: 300 },
+    iphone16: { name: 'iPhone 16', cost: 500 },
+    samsungGalaxy: { name: 'Samsung Galaxy', cost: 200 },
+    nokia: { name: 'Nokia', cost: 150 },
+    xiaomi: { name: 'Xiaomi', cost: 100 },
+    iphoneCharger: { name: 'iPhone Charger', cost: 45 },
+    samsungCharger: { name: 'Samsung Charger', cost: 30 },
+    nokiaCharger: { name: 'Nokia Charger', cost: 25 },
+    xiaomiCharger: { name: 'Xiaomi Charger', cost: 25 },
   };
 
-  const handleAddItem = (e) => {
-    e.preventDefault();
-    if (selectedItemType === 'none') return;
-    const item = itemTypes[selectedItemType];
+  const handleAddItem = (type, selectedType) => {
+    if (selectedType === 'none') return;
+
+    const item = itemTypes[selectedType];
 
     // Prevent adding duplicates
     if (selectedItems.some(i => i.name === item.name)) {
@@ -22,6 +30,13 @@ const FormCourtesyPhone = forwardRef(({ customerType, setBond, setCourtesyPhoneI
     }
 
     setSelectedItems([...selectedItems, item]);
+
+    // Reset the selection
+    if (type === 'phone') {
+      setSelectedItemType('none');
+    } else {
+      setSelectedChargerType('none');
+    }
   };
 
   const handleRemoveItem = (name) => {
@@ -33,6 +48,7 @@ const FormCourtesyPhone = forwardRef(({ customerType, setBond, setCourtesyPhoneI
     resetItems() {
       setSelectedItems([]);
       setSelectedItemType('none');
+      setSelectedChargerType('none');
       setBond(0);
     }
   }));
@@ -52,33 +68,54 @@ const FormCourtesyPhone = forwardRef(({ customerType, setBond, setCourtesyPhoneI
     <>
       <h2>Courtesy Phone</h2>
       
-      {/* Item selection */}
-      <div className="row mt-3">
-        <label className="col-12 col-md-4">Item Type: </label>
-        <div className="col-12 col-md-6">
+      {/* Title and input for phone selection */}
+      <h4>Choose a phone:</h4>
+      <div className="row align-items-center mb-2">
+        <label className="col-12 col-md-4">Item Type:</label>
+        <div className="col-12 col-md-8">
           <select 
-            className="form-select" 
+            className="form-select form-select-sm" 
             value={selectedItemType} 
-            onChange={(e) => setSelectedItemType(e.target.value)}
+            onChange={(e) => {
+              setSelectedItemType(e.target.value);
+              handleAddItem('phone', e.target.value);
+            }}
           >
             <option value="none">None</option>
-            <option value="iphone">iPhone</option>
-            <option value="other">Other phones</option>
-            <option value="charger">Charger</option>
+            <option value="iphone10">iPhone 10</option>
+            <option value="iphone14">iPhone 14</option>
+            <option value="iphone16">iPhone 16</option>
+            <option value="samsungGalaxy">Samsung Galaxy</option>
+            <option value="nokia">Nokia</option>
+            <option value="xiaomi">Xiaomi</option>
           </select>
         </div>
-        <div className="col-12 col-md-2">
-          <button 
-            className="btn btn-light w-100 mt-2 mt-md-0"
-            onClick={handleAddItem}
+      </div>
+
+      {/* Title and input for charger selection */}
+      <h4>Choose a charger:</h4>
+      <div className="row align-items-center mb-2">
+        <label className="col-12 col-md-4">Item Type:</label>
+        <div className="col-12 col-md-8">
+          <select 
+            className="form-select form-select-sm" 
+            value={selectedChargerType} 
+            onChange={(e) => {
+              setSelectedChargerType(e.target.value);
+              handleAddItem('charger', e.target.value);
+            }}
           >
-            Add
-          </button>
+            <option value="none">None</option>
+            <option value="iphoneCharger">iPhone Charger</option>
+            <option value="samsungCharger">Samsung Charger</option>
+            <option value="nokiaCharger">Nokia Charger</option>
+            <option value="xiaomiCharger">Xiaomi Charger</option>
+          </select>
         </div>
       </div>
 
       {/* Displaying added items */}
-      <div className="mt-4 bg-white">
+      <div className="mt-3 bg-white">
         <table className="table table-bordered" style={{ tableLayout: 'fixed', width: '100%' }}>
           <thead>
             <tr>
